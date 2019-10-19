@@ -57,8 +57,10 @@ int getSequentialSum(std::vector<int> vec) {
 }
 
 std::vector<int> getRandomMatrix(int n, int m) {
-    if (n*m <= 0)
+    if (n <= 0 || m <= 0)
         throw std::runtime_error("Matrix size <= 0");
+    if (n > (INT32_MAX/100)/m || m > (INT32_MAX/100)/n)
+        throw std::runtime_error("Matrix size too big (overflow opportuniy)");
     std::mt19937 gen;
     gen.seed(static_cast<unsigned int>(time(0)));
     std::vector<int> matrix(n*m);

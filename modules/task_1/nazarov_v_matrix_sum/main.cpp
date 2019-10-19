@@ -73,6 +73,18 @@ TEST(Parallel_Sum_MPI, Test_Matrix_Size_Not_Positive) {
     }
 }
 
+TEST(Parallel_Sum_MPI, Test_Matrix_Size_Too_Big) {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::vector<int> matrix;
+    const int matrix_size_n = 10000;
+    const int matrix_size_m = 2500;
+
+    if (rank == 0) {
+        ASSERT_ANY_THROW(getRandomMatrix(matrix_size_m, matrix_size_n));
+    }
+}
+
 TEST(Parallel_Sum_MPI, Test_Vector_and_Matrix_Size_Different) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
