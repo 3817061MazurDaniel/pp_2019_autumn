@@ -43,7 +43,7 @@ TEST(int_monte_carlo, integral_of_example_with_large_interval) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   double res = getIntegral(100000, example, -50.0, 50.0);
   if (rank == 0) {
-  ASSERT_NEAR(res, 1133.333333333333, 200);
+  ASSERT_NEAR(res, 1133.333333333333, 300);
   }
 }
 
