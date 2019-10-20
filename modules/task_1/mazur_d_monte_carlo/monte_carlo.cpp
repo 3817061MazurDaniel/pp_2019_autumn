@@ -1,5 +1,4 @@
-﻿// Copyright 2019 Mazur Daniil
-
+﻿  // Copyright 2019 Mazur Daniil
 #include "../../../modules/task_1/mazur_d_monte_carlo/monte_carlo.h"
 #include <stdio.h>
 #include <stdlib.h>
