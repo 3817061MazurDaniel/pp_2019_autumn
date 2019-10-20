@@ -1,4 +1,5 @@
 ﻿// Copyright 2019 Mazur Daniil
+
 #include "../../../modules/task_1/mazur_d_monte_carlo/monte_carlo.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +23,7 @@ double getIntegral(int nPoints, double(*func)(double), double x1, double x2) {
   MPI_Comm_size(MPI_COMM_WORLD, &procNum);
   MPI_Comm_rank(MPI_COMM_WORLD, &procRank);
   step = (x2 - x1) / 10000;
-  for (int i = procRank; i < nPoints; i += procNum){
+  for (int i = procRank; i < nPoints; i += procNum) {
     if (max < func(x1 + step * i))
       max = func(x1 + step * i);
   }
