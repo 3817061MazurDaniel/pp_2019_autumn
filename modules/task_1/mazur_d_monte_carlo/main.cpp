@@ -16,7 +16,7 @@ TEST(int_monte_carlo, integral_of_example_with_10000_points) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   double res = getIntegral(10000, example, 0.0, 6.0);
   if (rank == 0) {
-    ASSERT_NEAR(res, 18.07980730208778, 1);
+    ASSERT_NEAR(res, 18.07980730208778, 2);
   }
 }
 
@@ -25,7 +25,7 @@ TEST(int_monte_carlo, integral_of_example_with_10_points) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   double res = getIntegral(10000, example, 0.0, 6.0);
   if (rank == 0) {
-    ASSERT_NEAR(res, 18.07980730208778, 1);
+    ASSERT_NEAR(res, 18.07980730208778, 2);
   }
 }
 
