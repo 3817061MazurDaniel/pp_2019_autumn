@@ -11,8 +11,6 @@ const int smth = 155;
 const int readRequest = 1;
 const int finishRead = 2;
 const int writeRequest = 3;
-const int request = 4;
-const int queueRequest = 5;
 
 
 int startTask(int writersCount) {
@@ -84,9 +82,6 @@ int startTask(int writersCount) {
 
     if (rank > 0 && rank <= writersCount) {
       request = writeRequest;
-      std::mt19937 gen(time(0));
-      std::uniform_int_distribution<> check(0, 100);
-
       data = rank;
       {
         MPI_Send(&request, 1, MPI_INT, server, smth, MPI_COMM_WORLD);
@@ -98,8 +93,6 @@ int startTask(int writersCount) {
     }
 
     if (rank > writersCount&& rank < size) {
-      std::mt19937 gen(time(0));
-      std::uniform_int_distribution<> check(0, 100);
       {
         request = readRequest;
         MPI_Send(&request, 1, MPI_INT, server, smth, MPI_COMM_WORLD);
@@ -109,7 +102,7 @@ int startTask(int writersCount) {
         }
     }
   } else {
-    throw - 1;
+    throw -1;
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
