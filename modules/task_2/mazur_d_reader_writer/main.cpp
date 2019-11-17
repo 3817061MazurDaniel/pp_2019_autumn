@@ -35,7 +35,7 @@ TEST(Writers_Readers_Problem, writersCount_is_fine) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   writersCount = 2;
   MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
-  ASSERT_EQ(startTask(writersCount), 0);
+  ASSERT_ANY_THROW(startTask(writersCount));
 }
 
 TEST(Writers_Readers_Problem, writersCount_is_fine2) {
@@ -43,7 +43,7 @@ TEST(Writers_Readers_Problem, writersCount_is_fine2) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   writersCount = 3;
   MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
-  ASSERT_EQ(startTask(writersCount), 0);
+  ASSERT_ANY_THROW(startTask(writersCount));
 }
 
 
