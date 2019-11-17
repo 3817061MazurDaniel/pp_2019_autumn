@@ -13,7 +13,6 @@ const int finishRead = 2;
 const int writeRequest = 3;
 const int request = 4;
 const int queueRequest = 5;
-using namespace std;
 
 
 int startTask(int writersCount) {
@@ -34,8 +33,8 @@ int startTask(int writersCount) {
 
   if (writersCount < size - 2 && writersCount > 0) {
     if (rank == 0) {
-      cout << "\n" << "The server has been started" << endl;
-      cout << "Writers count = " << writersCount << endl;
+      std::cout << "\n" << "The server has been started" << std::endl;
+      std::cout << "Writers count = " << writersCount << std::endl;
 
       while (true) {
         if (readyToRecieve == 1) {
@@ -48,34 +47,34 @@ int startTask(int writersCount) {
             if (!readersCount) {
               onResponse = 1;
               MPI_Send(&onResponse, 1, MPI_INT, mpiStatus.MPI_SOURCE, server, MPI_COMM_WORLD);
-              cout << "\n" << "************WORKS WRITER************" << endl;
-              cout << "Process " << mpiStatus.MPI_SOURCE << " is writing" << endl;
+              std::cout << "\n" << "************WORKS WRITER************" << std::endl;
+              std::cout << "Process " << mpiStatus.MPI_SOURCE << " is writing" << std::endl;
               MPI_Recv(&data, 1, MPI_INT, MPI_ANY_SOURCE, mpiStatus.MPI_SOURCE, MPI_COMM_WORLD, &mpiStatus);
-              cout << "data = " << data << endl;
+              std::cout << "data = " << data << std::endl;
               readyToRecieve = 1;
             } else {
                 onResponse = 0;
                 MPI_Send(&onResponse, 1, MPI_INT, mpiStatus.MPI_SOURCE, server, MPI_COMM_WORLD);
-                cout << "\n" << "************WORKS READER************" << endl;
-                cout << "Process " << mpiStatus.MPI_SOURCE << " : ACCESS DENIED" << endl;
+                std::cout << "\n" << "************WORKS READER************" << std::endl;
+                std::cout << "Process " << mpiStatus.MPI_SOURCE << " : ACCESS DENIED" << std::endl;
                 readyToRecieve = 1;
             }
           }
           if ((index) && (request == readRequest)) {
-            cout << "\n" << "************************************" << endl;
-            cout << "Process " << mpiStatus.MPI_SOURCE << " reading..." << endl;
+            std::cout << "\n" << "************************************" << std::endl;
+            std::cout << "Process " << mpiStatus.MPI_SOURCE << " reading..." << std::endl;
             readersCount++;
             MPI_Isend(&data, 1, MPI_INT, mpiStatus.MPI_SOURCE, readRequest, MPI_COMM_WORLD, &mpiRequest);
-            cout << "Server sent data to " << mpiStatus.MPI_SOURCE << ", data = " << data << endl;
-            cout << "Current readers count: " << readersCount << endl;
+            std::cout << "Server sent data to " << mpiStatus.MPI_SOURCE << ", data = " << data << std::endl;
+            std::cout << "Current readers count: " << readersCount << std::endl;
             readyToRecieve = 1;
             ++steps;
           }
           if ((index) && (request == finishRead)) {
             readersCount--;
-            cout << "\n" << "************************************" << endl;
-            cout << "Process " << mpiStatus.MPI_SOURCE << " finishes reading " << endl;
-            cout << "Current readers count: " << readersCount << endl;
+            std::cout << "\n" << "************************************" << std::endl;
+            std::cout << "Process " << mpiStatus.MPI_SOURCE << " finishes reading " << std::endl;
+            std::cout << "Current readers count: " << readersCount << std::endl;
             readyToRecieve = 1;
           }
         }
@@ -109,8 +108,7 @@ int startTask(int writersCount) {
         MPI_Send(&request, 1, MPI_INT, server, smth, MPI_COMM_WORLD);
         }
     }
-  }
-  else {
+  } else {
     throw - 1;
   }
 
