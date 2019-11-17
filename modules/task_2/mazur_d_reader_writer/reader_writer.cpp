@@ -1,5 +1,5 @@
 // Copyright 2019 Mazur Daniil
-#include "mpi.h"
+#include <mpi.h>
 #include <iostream>
 #include <ctime>
 #include <algorithm>
@@ -16,8 +16,7 @@ const int queueRequest = 5;
 using namespace std;
 
 
-int startTask(int writersCount)
-{
+int startTask(int writersCount) {
   int rank, size;
   int data = 1;
   int request = 6;
@@ -54,13 +53,12 @@ int startTask(int writersCount)
               MPI_Recv(&data, 1, MPI_INT, MPI_ANY_SOURCE, mpiStatus.MPI_SOURCE, MPI_COMM_WORLD, &mpiStatus);
               cout << "data = " << data << endl;
               readyToRecieve = 1;
-            }
-            else {
-              onResponse = 0;
-              MPI_Send(&onResponse, 1, MPI_INT, mpiStatus.MPI_SOURCE, server, MPI_COMM_WORLD);
-              cout << "\n" << "************WORKS READER************" << endl;
-              cout << "Process " << mpiStatus.MPI_SOURCE << " : ACCESS DENIED" << endl;
-              readyToRecieve = 1;
+            } else {
+                onResponse = 0;
+                MPI_Send(&onResponse, 1, MPI_INT, mpiStatus.MPI_SOURCE, server, MPI_COMM_WORLD);
+                cout << "\n" << "************WORKS READER************" << endl;
+                cout << "Process " << mpiStatus.MPI_SOURCE << " : ACCESS DENIED" << endl;
+                readyToRecieve = 1;
             }
           }
           if ((index) && (request == readRequest)) {
@@ -82,7 +80,6 @@ int startTask(int writersCount)
           }
         }
         if ((steps > 0) && (readersCount == 0)) break;
-
       }
     }
 
@@ -113,7 +110,9 @@ int startTask(int writersCount)
         }
     }
   }
-  else throw - 1;
+  else {
+    throw - 1;
+  }
 
   MPI_Barrier(MPI_COMM_WORLD);
   return 0;

@@ -1,5 +1,5 @@
 // Copyright 2019 Mazur Daniil
-#include "mpi.h"
+#include <mpi.h>
 #include <gtest/gtest.h>
 #include <gtest-mpi-listener.hpp>
 #include <iostream>
