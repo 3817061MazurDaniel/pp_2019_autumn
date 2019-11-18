@@ -8,6 +8,7 @@ std::string RandomString(int _size) {
   std::string _str = "0123456789abcdefghijklmnopqrstuvwxyz";
   if (_size <= 0)
     throw "Negative size";
+  std::string prep = ".?!";
   char *a;
   a = new char[_size];
   for (int i = 0; i < _size; i++) {
@@ -16,7 +17,7 @@ std::string RandomString(int _size) {
   a[_size] = '\0';
   std::string str = a;
   for (int i = 1; i < _size; i += 4) {
-    str[i] = '.';
+    str[i] = prep[rand() % prep.size()];
   }
   return str;
 }
@@ -25,7 +26,7 @@ int GetCountInPart(std::string str) {
   int count = 0;
   int j = str.size();
   for (int i = 0; i < j; i++) {
-    if (str[i] == '.')
+    if (str[i] == '.' || str[i] == '!' || str[i] == '?')
       count++;
   }
   return count;
@@ -56,7 +57,7 @@ int GetCountInText(std::string str) {
     MPI_Recv(&lch[0], p, MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
     lch[p] = '\0';
     lstr = lch;
-    }
+  }
   lc = GetCountInPart(lstr);
   MPI_Reduce(&lc, &gl, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 

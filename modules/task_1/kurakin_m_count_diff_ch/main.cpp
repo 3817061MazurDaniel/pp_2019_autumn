@@ -40,20 +40,18 @@ TEST(Count_Diff_Ch_MPI, Test_Find_Count_Diff_Ch_Sequential_Rand) {
     }
 }
 
-TEST(Count_Diff_Ch_MPI, Test_Find_Count_Diff_Ch_Parallel_Rand) {
-    int rank;
-    int expResult;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::string str1, str2;
-    if (rank == 0) {
-    str1 = getRandomString(10);
-    str2 = getRandomString(10);
-    }
-    int countDiff = getCountDiffChPar(str1, str2);
-    if (rank == 0) {
-        expResult = getCountDiffChSeq(str1, str2, 0, str1.length());
-        ASSERT_EQ(expResult, countDiff);
-    }
+TEST(Count_Diff_Char_MPI, Count_Diff_Char_Same_Str) {
+  int rank;
+  int expResult = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  std::string str1, str2;
+  str1 = "123456789";
+  str2 = "123456789";
+  int countDiff;
+  countDiff = getCountDiffChPar(str1, str2);
+  if (rank == 0) {
+    ASSERT_EQ(expResult, countDiff);
+  }
 }
 
 TEST(Count_Diff_Ch_MPI, Test_Find_Count_Diff_Ch_Parallel) {

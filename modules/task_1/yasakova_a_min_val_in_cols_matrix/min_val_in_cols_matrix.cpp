@@ -30,19 +30,28 @@ std::vector <int> ParallelMinInColsMatrix(const std::vector <int>& mtx, int rows
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     int amount = cols / size;
     int rest = cols % size;
-    std::vector<int> rank_v(amount * rows);
+    std::vector<int> rank_v((amount + 1) * rows);
     std::vector<int> a(cols * rows);
     if (rank == 0) {
         a = TransposeMatrix(mtx, rows, cols);
         if (amount > 0) {
             for (int proc = 1; proc < size; proc++) {
-                MPI_Send(&a[(amount * proc + rest) * rows], amount * rows, MPI_INT, proc, 1, MPI_COMM_WORLD);
+                if (proc < rest) {
+                    MPI_Send(&a[(amount * proc + proc) * rows], (amount + 1) * rows, MPI_INT, proc, 1, MPI_COMM_WORLD);
+                } else {
+                    MPI_Send(&a[(amount * proc + rest) * rows], amount * rows, MPI_INT, proc, 1, MPI_COMM_WORLD);
+                }
             }
         }
     } else {
         MPI_Status status;
         if (amount > 0) {
-           MPI_Recv(&rank_v[0], amount * rows, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+            if (rank < rest) {
+                MPI_Recv(&rank_v[0], (amount + 1) * rows, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+                amount++;
+            } else {
+                MPI_Recv(&rank_v[0], amount * rows, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
+            }
         }
     }
     std::vector<int> res;
@@ -50,26 +59,37 @@ std::vector <int> ParallelMinInColsMatrix(const std::vector <int>& mtx, int rows
         MPI_Status status;
         int min_el = rows * cols;
         std::vector<int> min(rows);
-        rank_v = std::vector<int>(a.begin(), a.begin() + rest * rows + amount * rows);
-        for (int i = 0; i < amount + rest; i++) {
-            for (int j = 0; j < rows; j++) {
-                min_el = std::min(rank_v[i * rows + j], min_el);
+        int rest_ = rest;
+        if (amount > 0) {
+            if (rest > 0) {
+                rest_ = 1;
+            } else {
+                rest_ = 0;
             }
+        }
+        rank_v = std::vector<int>(a.begin(), a.begin() + (rest_ + amount) * rows);
+        for (int i = 0; i < rest_ + amount; i++) {
+            std::vector<int>temp = std::vector<int>(rank_v.begin() + i * rows, rank_v.begin() + (i + 1) * rows);
+            min_el = std::min(*min_element(temp.begin(), temp.end()), min_el);
             res.push_back(min_el);
             min_el = rows * cols;
         }
         if (amount > 0) {
             for (int proc = 1; proc < size; proc++) {
-                MPI_Recv(&min[0], amount, MPI_INT, proc, 2, MPI_COMM_WORLD, &status);
-                res.insert(res.end(), min.begin(), min.begin() + amount);
+                if (proc < rest) {
+                    MPI_Recv(&min[0], amount + 1, MPI_INT, proc, 2, MPI_COMM_WORLD, &status);
+                    res.insert(res.end(), min.begin(), min.begin() + amount + 1);
+                } else {
+                    MPI_Recv(&min[0], amount, MPI_INT, proc, 2, MPI_COMM_WORLD, &status);
+                    res.insert(res.end(), min.begin(), min.begin() + amount);
+                }
             }
         }
     } else if (amount > 0) {
         int min_el = rows * cols;
         for (int i = 0; i < amount; i++) {
-            for (int j = 0; j < rows; j++) {
-                 min_el = std::min(rank_v[i * rows + j], min_el);
-            }
+            std::vector<int>temp = std::vector<int>(rank_v.begin() + i * rows, rank_v.begin() + (i + 1) * rows);
+            min_el = std::min(*min_element(temp.begin(), temp.end()), min_el);
             res.push_back(min_el);
             min_el = rows * cols;
         }

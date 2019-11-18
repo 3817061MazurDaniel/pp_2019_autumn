@@ -50,13 +50,17 @@ int getParallelScalarProduct(const std::vector<int>& a, const std::vector<int>& 
         }
     }
 
-    std::vector<int> locA(v_size + re);
-    std::vector<int> locB(v_size + re);
+    std::vector<int> locA(v_size);
+    std::vector<int> locB(v_size);
+
 
     if (rank == 0) {
         locA = std::vector<int>(a.begin(), a.begin() + v_size);
         locB = std::vector<int>(b.begin(), b.begin() + v_size);
     } else if (rank == size - 1) {
+        locA.resize(v_size + re);
+        locB.resize(v_size + re);
+
         MPI_Status status;
         MPI_Recv(&locA[0], v_size + re, MPI_INT, 0, 2, MPI_COMM_WORLD, &status);
         MPI_Recv(&locB[0], v_size + re, MPI_INT, 0, 3, MPI_COMM_WORLD, &status);

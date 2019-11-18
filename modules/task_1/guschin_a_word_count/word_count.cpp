@@ -1,11 +1,20 @@
 // Copyright 2019 Guschin Alexander
-#include "../../../modules/task_1/guschin_a_word_count/word_count.h"
 #include <mpi.h>
 #include <string>
 #include <vector>
+#include <random>
+#include <ctime>
+#include "../../../modules/task_1/guschin_a_word_count/word_count.h"
+
 
 bool isLetter(char sym) {
   return (sym <= 'z' && sym >= 'a') || (sym <= 'Z' && sym >= 'A');
+}
+
+void randWord(std::string* st, int add_size) {
+  std::vector<std::string> vec{"MPI ", "size ", "vec "};
+  std::mt19937 gen(time(0));
+  for (int i = 0; i < add_size; i++) *st += vec[gen() % 3];
 }
 
 int getLinearCount(std::string st, int size) {
@@ -25,15 +34,21 @@ int getLinearCount(std::string st, int size) {
   return count;
 }
 
-int getCount(const std::string st, int st_size) {
+
+int getCount(const std::string st) {
   int size, rank;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  int vec_size = 0;
+  if (rank == 0) vec_size = st.size();
+
+  MPI_Bcast(&vec_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
   int local_count = 0;
   int global_count;
-  int delta = st_size / size;
-  int rem = st_size % size;
+  int delta = vec_size / size;
+  int rem = vec_size % size;
 
   if (rank == 0) {
     for (int i = 1; i < size; i++) {
@@ -52,11 +67,10 @@ int getCount(const std::string st, int st_size) {
     local_count = getLinearCount(std::string(&local_st[0], delta), delta);
   }
 
-
   MPI_Reduce(&local_count, &global_count, 1, MPI_INT, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
-  if (rank == 0 && st_size >= size) {
+  if (rank == 0 && vec_size >= size) {
     for (int i = 1; i < size; i++)
       if (isLetter(st[i * delta + rem - 1]) && isLetter(st[i * delta + rem]))
         global_count--;

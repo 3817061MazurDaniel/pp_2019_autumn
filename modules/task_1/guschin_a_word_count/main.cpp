@@ -53,12 +53,12 @@ TEST(word_count, parallelCount) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::string st;
   if (rank == 0) {
-    st = "MPI is live etc";
+    randWord(&st, 99);
   }
-  int res = getCount(st, 15);
+  int res = getCount(st);
 
   if (rank == 0) {
-    ASSERT_EQ(res, 4);
+    ASSERT_EQ(res, 99);
   }
 }
 
