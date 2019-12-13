@@ -5,21 +5,43 @@
 #include <vector>
 #include "../../../modules/task_3/mazur_d_sobele/sobele.h"
 
-TEST(Sobele, Test_Image_9_rows_9_cols) {
+TEST(Sobele, Test_Image_15_rows_15_cols) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  constexpr int rows{ 9 };
-  constexpr int cols{ 9 };
+  constexpr int rows{ 15 };
+  constexpr int cols{ 15 };
 
-  std::vector<unsigned char> src = randomMatrix(cols, rows);;
-  std::vector<unsigned char> resPar;
-  std::vector<unsigned char> resSeq;
+  std::vector<unsigned short> src = randomMatrix(rows, cols);;
+  std::vector<unsigned short> resPar;
+  std::vector<unsigned short> resSeq;
 
-  resPar = parSobele(src, cols, rows);
+  resPar = parSobele(src, rows, cols);
 
   if (rank == 0) {
-    resSeq = soloSobele(src, cols, rows);
+    resSeq = soloSobele(src, rows, cols);
+#ifdef DEBUG
+    std::cout << "Start Matrix:" << std::endl;
+    for (int i = 0; i < cols * rows; ++i) {
+      std::cout << (unsigned int)src[i] << " ";
+      if ((i + 1) % cols == 0)
+        std::cout << '\n';
+    }
+
+    std::cout << "Parallel result:" << std::endl;
+    for (int i = 0; i < cols * rows; ++i) {
+      std::cout << (unsigned int)resPar[i] << " ";
+      if ((i + 1) % cols == 0)
+        std::cout << '\n';
+    }
+    std::cout << std::endl;
+    std::cout << "Sequential result:" << std::endl;
+    for (int i = 0; i < cols * rows; ++i) {
+      std::cout << (unsigned int)resSeq[i] << " ";
+      if ((i + 1) % cols == 0)
+        std::cout << '\n';
+    }
+#endif //DEBUG
     ASSERT_EQ(resPar, resSeq);
   }
 }
