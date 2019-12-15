@@ -12,10 +12,9 @@ TEST(Sobele, Test_Image_15_rows_15_cols) {
   constexpr int rows{ 15 };
   constexpr int cols{ 15 };
 
-  std::vector<unsigned short> src = randomMatrix(rows, cols);;
-  std::vector<unsigned short> resPar;
-  //int resPar;
-  std::vector<unsigned short> resSeq;
+  std::vector<unsigned int> src = randomMatrix(rows, cols);;
+  std::vector<unsigned int> resPar;
+  std::vector<unsigned int> resSeq;
   std::cout << "proc " << rank << " start test" << '\n';
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
