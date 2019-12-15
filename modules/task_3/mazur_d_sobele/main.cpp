@@ -9,39 +9,115 @@ TEST(Sobele, Test_Image_15_rows_15_cols) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  constexpr int rows{ 15 };
-  constexpr int cols{ 15 };
+  int rows = 15;
+  int cols = 15;
 
-  std::vector<unsigned short> src = randomMatrix(rows, cols);;
-  std::vector<unsigned short> resPar;
-  std::vector<unsigned short> resSeq;
+  std::vector<int> src = randomMatrix(rows, cols);
+  std::vector<int> resPar;
+  std::vector<int> resSeq;
+  if (rank == 0)
+    resSeq = soloSobele(src, rows, cols);
+  resPar = parSobele(src, rows, cols);
+  /*if (rank == 0) {
+    std::cout << "StartMatrix" << '\n';
+    for (int i = 0; i < cols * rows; ++i) {
+      if (i % (cols) == 0)
+        std::cout << '\n';
+      std::cout << src[i] << ' ';
+    }
 
+    std::cout << "soloMatrix" << '\n';
+    for (int i = 0; i < cols * rows; ++i) {
+      if (i % (cols) == 0)
+        std::cout << '\n';
+      std::cout << resSeq[i] << ' ';
+    }
+    std::cout << "parMartix" << '\n';
+    for (int i = 0; i < cols * rows; ++i) {
+      if (i % (cols) == 0)
+        std::cout << '\n';
+      std::cout << resPar[i] << ' ';
+    }
+  } */
+  if (rank == 0) {
+    ASSERT_EQ(resPar, resSeq);
+  }
+}
+
+
+
+TEST(Sobele, Test_Image_100_rows_102_cols) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int rows = 100;
+  int cols = 102;
+
+  std::vector<int> src = randomMatrix(rows, cols);
+  std::vector<int> resPar;
+  std::vector<int> resSeq;
+  if (rank == 0)
+    resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
 
   if (rank == 0) {
-    resSeq = soloSobele(src, rows, cols);
-#ifdef DEBUG
-    std::cout << "Start Matrix:" << std::endl;
-    for (int i = 0; i < cols * rows; ++i) {
-      std::cout << (unsigned int)src[i] << " ";
-      if ((i + 1) % cols == 0)
-        std::cout << '\n';
-    }
+    ASSERT_EQ(resPar, resSeq);
+  }
+}
+TEST(Sobele, Test_Image_42_rows_83_cols) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    std::cout << "Parallel result:" << std::endl;
-    for (int i = 0; i < cols * rows; ++i) {
-      std::cout << (unsigned int)resPar[i] << " ";
-      if ((i + 1) % cols == 0)
-        std::cout << '\n';
-    }
-    std::cout << std::endl;
-    std::cout << "Sequential result:" << std::endl;
-    for (int i = 0; i < cols * rows; ++i) {
-      std::cout << (unsigned int)resSeq[i] << " ";
-      if ((i + 1) % cols == 0)
-        std::cout << '\n';
-    }
-#endif //DEBUG
+  int rows = 42;
+  int cols = 83;
+
+  std::vector<int> src = randomMatrix(rows, cols);
+  std::vector<int> resPar;
+  std::vector<int> resSeq;
+  if (rank == 0)
+    resSeq = soloSobele(src, rows, cols);
+  resPar = parSobele(src, rows, cols);
+
+  if (rank == 0) {
+    ASSERT_EQ(resPar, resSeq);
+  }
+}
+
+
+TEST(Sobele, Test_Image_3_rows_3_cols) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int rows = 3;
+  int cols = 3;
+
+  std::vector<int> src = randomMatrix(rows, cols);
+  std::vector<int> resPar;
+  std::vector<int> resSeq;
+  if (rank == 0)
+    resSeq = soloSobele(src, rows, cols);
+  resPar = parSobele(src, rows, cols);
+
+  if (rank == 0) {
+    ASSERT_EQ(resPar, resSeq);
+  }
+}
+
+TEST(Sobele, Test_Image_2_rows_6_cols) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  int rows = 2;
+  int cols = 6;
+
+  std::vector<int> src = randomMatrix(rows, cols);
+  std::vector<int> resPar;
+  std::vector<int> resSeq;
+  if (rank == 0)
+    resSeq = soloSobele(src, rows, cols);
+  resPar = parSobele(src, rows, cols);
+
+  if (rank == 0) {
     ASSERT_EQ(resPar, resSeq);
   }
 }
