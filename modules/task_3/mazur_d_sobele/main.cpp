@@ -12,6 +12,7 @@ TEST(Sobele, Test_Image_15_rows_15_cols) {
   constexpr int rows{ 15 };
   constexpr int cols{ 15 };
 
+<<<<<<< HEAD
   std::vector<unsigned int> src = randomMatrix(rows, cols);
   std::vector<unsigned int> resPar;
   std::vector<unsigned int> resSeq;
@@ -111,6 +112,13 @@ TEST(Sobele, Test_Image_44_rows_65_cols) {
   std::vector<unsigned int> resPar;
   std::vector<unsigned int> resSeq;
 
+=======
+  std::vector<unsigned short> src = randomMatrix(rows, cols);;
+  std::vector<unsigned short> resPar;
+  //int resPar;
+  std::vector<unsigned short> resSeq;
+  std::cout << "proc " << rank << " start test" << '\n';
+>>>>>>> parent of d79a381... alive2
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);

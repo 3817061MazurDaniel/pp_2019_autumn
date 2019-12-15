@@ -7,21 +7,22 @@
 #include <cmath>
 #include "../../../modules/task_3/mazur_d_sobele/sobele.h"
 
-std::vector<unsigned int> randomMatrix(int rows, int cols) {
+std::vector<unsigned short> randomMatrix(int rows, int cols) {
   std::mt19937 gen;
   gen.seed(static_cast<unsigned int>(time(0)));
-  std::vector<unsigned int> startMatrix(cols * rows);
+  std::vector<unsigned short> startMatrix(cols * rows);
   for (int i = 0; i < rows; i++)
     for (int j = 0; j < cols; j++)
-      startMatrix[i * rows + j] = static_cast<unsigned int>(gen() % 256);
+      startMatrix[i * rows + j] = static_cast<unsigned short>(gen() % 256);
 
   return startMatrix;
 }
 
-unsigned int sobeleFilt(std::vector <unsigned int> matrix, int cols, int pos) {
+unsigned short sobeleFilt(std::vector <unsigned short> matrix, int cols, int pos) {
   int xRes = 0;
   int yRes = 0;
 
+<<<<<<< HEAD
   xRes = matrix[pos + cols - 1] + 2 * matrix[pos + cols] + matrix[pos + cols + 1];
   xRes = xRes - matrix[pos - cols - 1] - 2 * matrix[pos - cols] - matrix[pos - cols + 1];
   yRes = matrix[pos - cols + 1] + 2 * matrix[pos + 1] + matrix[pos + cols + 1];
@@ -36,6 +37,29 @@ std::vector<unsigned int> soloSobele(std::vector<unsigned int> matrix, int rows,
 
   std::vector<unsigned int> finishMatrix(cols * rows);
 
+=======
+  xRes = matrix[pos + cols - 1] + 2 * matrix[pos + cols] + matrix[pos + cols + 1] - matrix[pos - cols - 1] - 2 * matrix[pos - cols] - matrix[pos - cols + 1];
+  yRes = matrix[pos - cols + 1] + 2 * matrix[pos + 1] + matrix[pos + cols + 1] - matrix[pos - cols - 1] - 2 * matrix[pos - 1] - matrix[pos + cols - 1];
+
+  /*if (pos == cols + 1)
+  {
+  std::cout << "pix =" << matrix[pos] << "\n";
+  std::cout << "xRes =" << xRes << "\n";
+  std::cout << "yRes =" << yRes << "\n";
+  std::cout << "___________________________________" << '\n';
+  std::cout << matrix[pos - cols - 1] << ' ' << matrix[pos - cols] << ' ' << matrix[pos - cols + 1] << '\n';
+  std::cout << matrix[pos - 1] << ' ' << matrix[pos] << ' ' << matrix[pos + 1] << '\n';
+  std::cout << matrix[pos + cols - 1] << ' ' << matrix[pos + cols] << ' ' << matrix[pos + cols + 1] << '\n';
+  std::cout << "_____________________________________" << '\n';
+  }*/
+  return static_cast<unsigned short> (sqrt(xRes * xRes + yRes * yRes));
+}
+
+std::vector<unsigned short> soloSobele(std::vector<unsigned short> matrix, int rows, int cols) {
+  
+  std::vector<unsigned short> finishMatrix(cols * rows);
+  
+>>>>>>> parent of d79a381... alive2
   for (int i = 0; i < rows; ++i)
     for (int j = 0; j < cols; ++j) {
       if ((i == 0) || (j == 0) || (i == rows - 1) || (j == cols - 1))
@@ -46,14 +70,19 @@ std::vector<unsigned int> soloSobele(std::vector<unsigned int> matrix, int rows,
   return finishMatrix;
 }
 
+<<<<<<< HEAD
 std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, int cols) {
   if ((rows < 3) || (cols < 3))
     return matrix;
 
+=======
+std::vector<unsigned short> parSobele(std::vector<unsigned short> matrix, int rows, int cols) {
+  ///int parSobele(std::vector<unsigned short> matrix, int rows, int cols) {
+>>>>>>> parent of d79a381... alive2
   int comm_size, rank;
   MPI_Status status;
 
-  std::vector<unsigned int> parMatrix(cols * rows);
+  std::vector<unsigned short> parMatrix(cols * rows);
 
   MPI_Comm_size(MPI_COMM_WORLD, &comm_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -91,20 +120,38 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
         firstPix = cols * pack * (i - 1) - cols;
       }
 
+<<<<<<< HEAD
       MPI_Send(&matrix[firstPix], pixCount, MPI_UNSIGNED, i, i*10, MPI_COMM_WORLD);
+=======
+      MPI_Send(&matrix[firstPix], pixCount, MPI_UNSIGNED_SHORT, i, i*10, MPI_COMM_WORLD);
+
+      std::cout << "Proc 0 sended packs to" << i << "proc" << '\n';
+>>>>>>> parent of d79a381... alive2
     }
   } else if (rank != 0) {
     int pixCount;
 
+<<<<<<< HEAD
     std::vector<unsigned int> inMatrix(pack * cols + 2 * cols);
     std::vector<unsigned int> outMatrix(pack * cols);
+=======
+    std::vector<unsigned short> inMatrix(pack * cols + 2 * cols);
+    std::vector<unsigned short> outMatrix(pack * cols);
+    std::cout << "proc " << rank << " initialized IN and OUT matrix" << '\n';
+>>>>>>> parent of d79a381... alive2
 
     if (rank == 1) {
       inMatrix.resize(cols * (pack + 1));
       pixCount = cols * (pack + 1);
+<<<<<<< HEAD
 
       MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED, 0, rank * 10, MPI_COMM_WORLD, &status);
 
+=======
+      
+      MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED_SHORT, 0, rank * 10, MPI_COMM_WORLD, &status);
+      //MPI_Barrier(MPI_COMM_WORLD);
+>>>>>>> parent of d79a381... alive2
       std::cout << "proc" << rank << "get inMatrix" << '\n';
       for (int i = 0; i < pack; ++i)
         for (int j = 0; j < cols; ++j)
@@ -113,6 +160,7 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
           else
             outMatrix[i * cols + j] = sobeleFilt(inMatrix, cols, i*cols + j);
       std::cout << "proc" << rank << "filted" << '\n';
+<<<<<<< HEAD
       MPI_Send(&outMatrix[0], pack * cols, MPI_UNSIGNED, 0, rank * 20, MPI_COMM_WORLD);
 
     } else if (rank == comm_size - 1) {
@@ -121,6 +169,19 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
 
       MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED, 0, rank * 10, MPI_COMM_WORLD, &status);
 
+=======
+      MPI_Send(&outMatrix[0], pack * cols, MPI_UNSIGNED_SHORT, 0, rank * 20, MPI_COMM_WORLD);
+    
+    
+    }
+    else if (rank == comm_size - 1) {
+      inMatrix.resize(cols * (pack2 + 1));
+      pixCount = cols * (pack2 + 1);
+
+      MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED_SHORT, 0, rank * 10, MPI_COMM_WORLD, &status);
+      //MPI_Barrier(MPI_COMM_WORLD);
+      std::cout << "proc" << rank << "get inMatrix" << '\n';
+>>>>>>> parent of d79a381... alive2
       for (int i = 1; i <= pack2; ++i)
         for (int j = 0; j < cols; ++j)
           if ((i == pack2) || (j == 0) || (j == cols - 1))
@@ -128,11 +189,23 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
           else
             outMatrix[(i - 1) * cols + j] = sobeleFilt(inMatrix, cols, i * cols + j);
 
+<<<<<<< HEAD
       MPI_Send(&outMatrix[0], pack2 * cols, MPI_UNSIGNED, 0, rank * 20, MPI_COMM_WORLD);
     } else {
       pixCount = cols * (pack + 2);
       MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED, 0, rank * 10, MPI_COMM_WORLD, &status);
 
+=======
+      MPI_Send(&outMatrix[0], pack2 * cols, MPI_UNSIGNED_SHORT, 0, rank * 20, MPI_COMM_WORLD);
+      
+    }
+    
+    else  {
+      pixCount = cols * (pack + 2);
+      MPI_Recv(&inMatrix[0], pixCount, MPI_UNSIGNED_SHORT, 0, rank * 10, MPI_COMM_WORLD, &status);
+      //MPI_Barrier(MPI_COMM_WORLD);
+      std::cout << "proc" << rank << "get inMatrix" << '\n';
+>>>>>>> parent of d79a381... alive2
       for (int i = 1; i <= pack; ++i)
         for (int j = 0; j < cols; ++j)
           if ((j == 0) || (j == cols - 1))
@@ -140,7 +213,12 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
           else
             outMatrix[(i - 1)  * cols + j] = sobeleFilt(inMatrix, cols, i * cols + j);
 
+<<<<<<< HEAD
       MPI_Send(&outMatrix[0], pack * cols, MPI_UNSIGNED, 0, rank * 20, MPI_COMM_WORLD);
+=======
+      MPI_Send(&outMatrix[0], pack * cols, MPI_UNSIGNED_SHORT, 0, rank * 20, MPI_COMM_WORLD);
+
+>>>>>>> parent of d79a381... alive2
     }
   }
 
@@ -149,10 +227,18 @@ std::vector<unsigned int> parSobele(std::vector<unsigned int> matrix, int rows, 
     for (int i = 1; i < comm_size; ++i) {
       if (i != comm_size - 1) {
         start = cols * pack * (i - 1);
+<<<<<<< HEAD
         MPI_Recv(&parMatrix[start], pack * cols, MPI_UNSIGNED, i, i * 20, MPI_COMM_WORLD, &status);
       } else {
         int start = cols * pack * (i - 1);
         MPI_Recv(&parMatrix[start], pack2 * cols, MPI_UNSIGNED, i, i * 20, MPI_COMM_WORLD, &status);
+=======
+        MPI_Recv(&parMatrix[start], pack * cols, MPI_UNSIGNED_SHORT, i, i * 20, MPI_COMM_WORLD, &status);
+      }
+      else {
+        int start = cols * pack * (i - 1);
+        MPI_Recv(&parMatrix[start], pack2 * cols, MPI_UNSIGNED_SHORT, i, i*20, MPI_COMM_WORLD, &status);
+>>>>>>> parent of d79a381... alive2
       }
     }
   }
