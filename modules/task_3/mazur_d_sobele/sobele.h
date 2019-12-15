@@ -1,4 +1,4 @@
-// Copyright 2019 Golubev Vladislav
+// Copyright 2019 Mazur Daniil
 #ifndef MODULES_TASK_3_MAZUR_D_SOBELE_SOBELE_H_
 #define MODULES_TASK_3_MAZUR_D_SOBELE_SOBELE_H_
 
@@ -6,7 +6,6 @@
 #include <random>
 #include <vector>
 
-#define DEBUG
 
 std::vector<unsigned int> randomMatrix(int rows, int cols);
 
