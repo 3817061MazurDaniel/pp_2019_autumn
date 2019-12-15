@@ -14,35 +14,33 @@ TEST(Sobele, Test_Image_15_rows_15_cols) {
 
   std::vector<unsigned short> src = randomMatrix(rows, cols);;
   std::vector<unsigned short> resPar;
-  //int resPar;
   std::vector<unsigned short> resSeq;
-  std::cout << "proc " << rank << " start test" << '\n';
-  if (rank == 0)
-    resSeq = soloSobele(src, rows, cols);
+
   resPar = parSobele(src, rows, cols);
- 
 
   if (rank == 0) {
+    resSeq = soloSobele(src, rows, cols);
 #ifdef DEBUG
-    /*std::cout << "Start Matrix:" << std::endl;
+    std::cout << "Start Matrix:" << std::endl;
     for (int i = 0; i < cols * rows; ++i) {
       std::cout << (unsigned int)src[i] << " ";
       if ((i + 1) % cols == 0)
         std::cout << '\n';
-    }*/
+    }
 
-   /* std::cout << "Parallel result:" << std::endl;
+    std::cout << "Parallel result:" << std::endl;
     for (int i = 0; i < cols * rows; ++i) {
       std::cout << (unsigned int)resPar[i] << " ";
       if ((i + 1) % cols == 0)
         std::cout << '\n';
     }
+    std::cout << std::endl;
     std::cout << "Sequential result:" << std::endl;
     for (int i = 0; i < cols * rows; ++i) {
       std::cout << (unsigned int)resSeq[i] << " ";
       if ((i + 1) % cols == 0)
         std::cout << '\n';
-    }*/
+    }
 #endif //DEBUG
     ASSERT_EQ(resPar, resSeq);
   }
