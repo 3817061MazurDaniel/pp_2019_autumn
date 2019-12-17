@@ -1,51 +1,78 @@
 // Copyright 2019 Mazur Daniil
 #include <gtest-mpi-listener.hpp>
 #include <gtest/gtest.h>
+#include <cmath>
 #include "./monte_carlo.h"
 
-double example(double x) {
-  return 0.01 * x * x + sin(2 * x) + 3;
+double example1(double x) {
+  return sin(x);
+}
+
+double example2(double x) {
+  return x*x;
+}
+
+double example3(double x) {
+  return x*x*x + 2*x;
+}
+
+double example4(double x) {
+  return 0.01 * x * x + sin(x);
 }
 
 TEST(int_monte_carlo, throws_when_n_points_is_zero) {
-  ASSERT_ANY_THROW(getIntegral(0, example, 2.0, 5.0));
+  ASSERT_ANY_THROW(soloIntegral(0, example1, 2.0, 5.0));
 }
 
-TEST(int_monte_carlo, integral_of_example_with_10000_points) {
+TEST(int_monte_carlo, integral_of_example1_with_100000_points) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  double res = getIntegral(10000, example, 0.0, 6.0);
+  double parResult = parIntegral(100000, example1, 0, 3.141592653589/2);
   if (rank == 0) {
-    ASSERT_NEAR(res, 18.07980730208778, 2);
+    double soloResult = soloIntegral(100000, example1, 0, 3.141592653589 / 2);
+    std::cout << soloResult << '\n';
+    std::cout << parResult << '\n';
+    ASSERT_NEAR(parResult, soloResult, 0.05);
   }
 }
 
-TEST(int_monte_carlo, integral_of_example_with_10_points) {
+TEST(int_monte_carlo, integral_of_example2_with_100000_points) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  double res = getIntegral(10000, example, 0.0, 6.0);
+  double parResult = parIntegral(100000, example2, 0, 3.141592653589 / 2);
   if (rank == 0) {
-    ASSERT_NEAR(res, 18.07980730208778, 2);
+    double soloResult = soloIntegral(100000, example2, 0, 3.141592653589 / 2);
+    std::cout << soloResult << '\n';
+    std::cout << parResult << '\n';
+    ASSERT_NEAR(parResult, soloResult, 0.05);
   }
 }
 
-TEST(int_monte_carlo, integral_of_example_with_0_interval) {
+TEST(int_monte_carlo, integral_of_example3_with_100000_points) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  double res = getIntegral(10000, example, 5.3, 5.3);
+  double parResult = parIntegral(100000, example3, 0, 3.141592653589 / 2);
   if (rank == 0) {
-  ASSERT_NEAR(res, 0, 1);
+    double soloResult = soloIntegral(100000, example3, 0, 3.141592653589 / 2);
+    std::cout << soloResult << '\n';
+    std::cout << parResult << '\n';
+    ASSERT_NEAR(parResult, soloResult, 0.05);
   }
 }
 
-TEST(int_monte_carlo, integral_of_example_with_large_interval) {
+TEST(int_monte_carlo, integral_of_example4_with_100000_points) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  double res = getIntegral(100000, example, -50.0, 50.0);
+  double parResult = parIntegral(100000, example4, 0, 3.141592653589 / 2);
   if (rank == 0) {
-  ASSERT_NEAR(res, 1133.333333333333, 300);
+    double soloResult = soloIntegral(100000, example4, 0, 3.141592653589 / 2);
+    std::cout << soloResult << '\n';
+    std::cout << parResult << '\n';
+    ASSERT_NEAR(parResult, soloResult, 0.05);
   }
 }
+
+
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

@@ -7,7 +7,8 @@
 #include <iostream>
 
 
-double getIntegral(int nPoints,  double(*func)(double), double x1, double x2);
+double parIntegral(int nPoints, double(*func)(double), double x1, double x2);
+double soloIntegral(int nPoints, double(*func)(double), double x1, double x2);
 
 
 #endif  // MODULES_TASK_1_MAZUR_D_MONTE_CARLO_MONTE_CARLO_H_
