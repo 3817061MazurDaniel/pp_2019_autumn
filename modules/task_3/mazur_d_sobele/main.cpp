@@ -12,9 +12,9 @@ TEST(Sobele, Test_Image_15_rows_15_cols) {
   int rows = 15;
   int cols = 15;
 
-  std::vector<int> src = randomMatrix(rows, cols);
-  std::vector<int> resPar;
-  std::vector<int> resSeq;
+  std::vector<unsigned char> src = randomMatrix(rows, cols);
+  std::vector<unsigned char> resPar;
+  std::vector<unsigned char> resSeq;
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
@@ -53,9 +53,9 @@ TEST(Sobele, Test_Image_100_rows_102_cols) {
   int rows = 100;
   int cols = 102;
 
-  std::vector<int> src = randomMatrix(rows, cols);
-  std::vector<int> resPar;
-  std::vector<int> resSeq;
+  std::vector<unsigned char> src = randomMatrix(rows, cols);
+  std::vector<unsigned char> resPar;
+  std::vector<unsigned char> resSeq;
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
@@ -71,9 +71,9 @@ TEST(Sobele, Test_Image_42_rows_83_cols) {
   int rows = 42;
   int cols = 83;
 
-  std::vector<int> src = randomMatrix(rows, cols);
-  std::vector<int> resPar;
-  std::vector<int> resSeq;
+  std::vector<unsigned char> src = randomMatrix(rows, cols);
+  std::vector<unsigned char> resPar;
+  std::vector<unsigned char> resSeq;
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
@@ -91,9 +91,9 @@ TEST(Sobele, Test_Image_3_rows_3_cols) {
   int rows = 3;
   int cols = 3;
 
-  std::vector<int> src = randomMatrix(rows, cols);
-  std::vector<int> resPar;
-  std::vector<int> resSeq;
+  std::vector<unsigned char> src = randomMatrix(rows, cols);
+  std::vector<unsigned char> resPar;
+  std::vector<unsigned char> resSeq;
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
@@ -110,9 +110,9 @@ TEST(Sobele, Test_Image_2_rows_6_cols) {
   int rows = 2;
   int cols = 6;
 
-  std::vector<int> src = randomMatrix(rows, cols);
-  std::vector<int> resPar;
-  std::vector<int> resSeq;
+  std::vector<unsigned char> src = randomMatrix(rows, cols);
+  std::vector<unsigned char> resPar;
+  std::vector<unsigned char> resSeq;
   if (rank == 0)
     resSeq = soloSobele(src, rows, cols);
   resPar = parSobele(src, rows, cols);
