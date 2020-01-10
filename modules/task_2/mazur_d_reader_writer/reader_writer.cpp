@@ -15,16 +15,16 @@ const int magic = 6;
 
 int startTask(int writersCount) {
   int rank, size;
-  int data = 0;
+  // int data = 0;
   int request = 6;
-  int index = 0;
+  // int index = 0;
   // int readersCount = 0;
-  int readyToRecieve = 1;
+  // int readyToRecieve = 1;
   int onResponse = 0;
-  int steps = 0;
+  // int steps = 0;
 
   MPI_Status mpiStatus;
-  MPI_Request mpiRequest;
+  // MPI_Request mpiRequest;
 
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
