@@ -54,6 +54,32 @@ TEST(Writers_Readers_Problem, writersCount_is_fine2) {
   }
 }
 
+TEST(Writers_Readers_Problem, writersCount_is_fine3) {
+  int size, writersCount, rankM;
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  writersCount = 4;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
+  if (writersCount < size - 2 && writersCount > 0) {
+    ASSERT_EQ(startTask(writersCount), 0);
+  }
+  else {
+    ASSERT_ANY_THROW(startTask(writersCount));
+  }
+}
+
+TEST(Writers_Readers_Problem, writersCount_is_fine4) {
+  int size, writersCount, rankM;
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  writersCount = 10;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
+  if (writersCount < size - 2 && writersCount > 0) {
+    ASSERT_EQ(startTask(writersCount), 0);
+  }
+  else {
+    ASSERT_ANY_THROW(startTask(writersCount));
+  }
+}
+
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
