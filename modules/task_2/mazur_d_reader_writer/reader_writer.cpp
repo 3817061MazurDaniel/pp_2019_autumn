@@ -15,7 +15,7 @@ const int magic = 6;
 
 int startTask(int writersCount) {
   int rank, size;
-  // int data = 0;
+  int data = 0;
   int request = 6;
   // int index = 0;
   // int readersCount = 0;
