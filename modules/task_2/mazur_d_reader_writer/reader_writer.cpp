@@ -35,6 +35,7 @@ int startTask(int writersCount) {
       int readersCount = 0;
       int localMagic = 0;
       int data = 0;
+      ++data;
       // std::cout << "\n" << "The server has been started" << std::endl;
       // std::cout << "Writers count = " << writersCount << std::endl;
       while (localMagic != (size - 1)) {
