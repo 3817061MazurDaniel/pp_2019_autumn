@@ -61,8 +61,7 @@ TEST(Writers_Readers_Problem, writersCount_is_fine3) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
   if (writersCount < size - 2 && writersCount > 0) {
     ASSERT_EQ(startTask(writersCount), 0);
-  }
-  else {
+  } else {
     ASSERT_ANY_THROW(startTask(writersCount));
   }
 }
@@ -74,8 +73,7 @@ TEST(Writers_Readers_Problem, writersCount_is_fine4) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rankM);
   if (writersCount < size - 2 && writersCount > 0) {
     ASSERT_EQ(startTask(writersCount), 0);
-  }
-  else {
+  } else {
     ASSERT_ANY_THROW(startTask(writersCount));
   }
 }

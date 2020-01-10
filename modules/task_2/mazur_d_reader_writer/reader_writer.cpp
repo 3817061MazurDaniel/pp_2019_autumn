@@ -18,7 +18,7 @@ int startTask(int writersCount) {
   int data = 0;
   int request = 6;
   int index = 0;
-  //int readersCount = 0;
+  // int readersCount = 0;
   int readyToRecieve = 1;
   int onResponse = 0;
   int steps = 0;
@@ -47,51 +47,43 @@ int startTask(int writersCount) {
             std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "writes" << std::endl;
             MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
             accsess = 0;
-          }
-          else {
+          } else {
             MPI_Send(&block, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
             std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "rejected. Works readers" << std::endl;
           }
-        }
-        else if (request == readRequest) {
+        } else if (request == readRequest) {
           if ((accsess == 1) /*|| (accsess = 3)*/) {
             MPI_Send(&block, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
             std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "rejected to read. Works writer" << std::endl;
-          }
-          else if (accsess == 0) {
+          } else if (accsess == 0) {
             accsess = 2;
             ++readersCount;
             std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "read" << std::endl;
             /*if (readersCount == 3)
               accsess = 3;*/
             MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
-          }
-          else if (accsess == 2) {
+          } else if (accsess == 2) {
             ++readersCount;
             /*if (readersCount == 3)
               accsess = 3;*/
             MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
           }
-        }
-        else if (request == finishRead) {
+        } else if (request == finishRead) {
           --readersCount;
           std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "read" << std::endl;
           if (readersCount == 0)
             accsess = 0;
           MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
-        }
-        else if (request == magic) {
+        } else if (request == magic) {
           ++localMagic;
           std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "finish work" << std::endl;
         }
         std::cout << "localmagic = " << localMagic << std::endl;
       }
-
     }
     if (rank > 0 && rank <= writersCount) {
       int procMagic = 0;
-      while (procMagic == 0)
-      {
+      while (procMagic == 0) {
         MPI_Send(&writeRequest, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Recv(&onResponse, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &mpiStatus);
         if (onResponse == done) {
@@ -102,8 +94,7 @@ int startTask(int writersCount) {
     }
     if (rank > writersCount&& rank < size) {
       int procMagic = 0;
-      while (procMagic == 0)
-      {
+      while (procMagic == 0) {
         MPI_Send(&readRequest, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
         MPI_Recv(&onResponse, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &mpiStatus);
         if (onResponse == done) {
@@ -116,8 +107,7 @@ int startTask(int writersCount) {
         }
       }
     }
-  }
-  else {
+  } else {
     throw - 1;
   }
 
