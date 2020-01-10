@@ -22,6 +22,7 @@ int startTask(int writersCount) {
   // int readyToRecieve = 1;
   int onResponse = 0;
   // int steps = 0;
+  data = -1;
 
   MPI_Status mpiStatus;
   // MPI_Request mpiRequest;
