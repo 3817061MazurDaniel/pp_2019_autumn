@@ -53,20 +53,16 @@ int startTask(int writersCount) {
             // std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "rejected. Works readers" << std::endl;
           }
         } else if (request == readRequest) {
-          if ((accsess == 1) /*|| (accsess = 3)*/) {
+          if (accsess == 1) {
             MPI_Send(&block, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
             // std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "rejected to read. Works writer" << std::endl;
           } else if (accsess == 0) {
             accsess = 2;
             ++readersCount;
             // std::cout << "\n" << "Proc" << mpiStatus.MPI_SOURCE << "read" << std::endl;
-            /*if (readersCount == 3)
-              accsess = 3;*/
             MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
           } else if (accsess == 2) {
             ++readersCount;
-            /*if (readersCount == 3)
-              accsess = 3;*/
             MPI_Send(&done, 1, MPI_INT, mpiStatus.MPI_SOURCE, 0, MPI_COMM_WORLD);
           }
         } else if (request == finishRead) {
