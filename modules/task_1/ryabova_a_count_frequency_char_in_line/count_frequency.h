@@ -7,5 +7,6 @@
 
 int getCount(std::string str, char c);
 int getCountCharInStr(std::string str, char ch);
+std::string getRandomString(int size);
 
 #endif  // MODULES_TASK_1_RYABOVA_A_COUNT_FREQUENCY_CHAR_IN_LINE_COUNT_FREQUENCY_H_

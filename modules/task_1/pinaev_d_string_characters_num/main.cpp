@@ -51,6 +51,21 @@ TEST(Str_Char_Num_MPI, Paral_Char_Num_Can_Process_Not_All_Vector) {
     }
 }
 
+TEST(Str_Char_Num_MPI, Paral_Char_For_One_Elen) {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    char *str;
+    size_t strSize = 1;
+    str = getRandomString(strSize);
+    int paralAnswer = getParalCarNum(str, strSize);
+
+    if (rank == 0) {
+        int seqAnswer = getCarNum(str, strSize);
+        ASSERT_EQ(seqAnswer, paralAnswer);
+    }
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     MPI_Init(&argc, &argv);

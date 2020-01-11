@@ -5,35 +5,21 @@
 #include <string>
 #include "./count_frequency.h"
 
-TEST(count_frequency, even_number_of_char) {
+TEST(count_frequency, count_frequency_in_random_str) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    std::string str = "ariana";
+    std::string str = getRandomString(5000);
     char c = 'a';
 
     int count = getCountCharInStr(str, c);
 
     if (rank == 0) {
-        ASSERT_EQ(3, count);
+       int count2 = getCount(str, c);
+       ASSERT_EQ(count2, count);
     }
 }
 
-TEST(count_frequency, odd_number_of_char) {
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    std::string str = "arianadad";
-    char c = 'a';
-
-    int count = getCountCharInStr(str, c);
-
-    if (rank == 0) {
-        ASSERT_EQ(4, count);
-    }
-}
-
-TEST(count_frequency, all_char_needed) {
+TEST(count_frequency, count_frequency_in_str_with_one_char) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -47,7 +33,7 @@ TEST(count_frequency, all_char_needed) {
     }
 }
 
-TEST(count_frequency, no_char_needed) {
+TEST(count_frequency, count_frequency_in_str_without_char) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -61,17 +47,31 @@ TEST(count_frequency, no_char_needed) {
     }
 }
 
-TEST(count_frequency, number_search) {
+TEST(count_frequency, count_frequency_in_odd_str) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    std::string str = "sdfghjkl12421";
-    char c = '1';
+    std::string str = "arianadad";
+    char c = 'a';
 
     int count = getCountCharInStr(str, c);
 
     if (rank == 0) {
-        ASSERT_EQ(2, count);
+        ASSERT_EQ(4, count);
+    }
+}
+
+TEST(count_frequency, count_frequency_in_even_str) {
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::string str = "ariana";
+    char c = 'a';
+
+    int count = getCountCharInStr(str, c);
+
+    if (rank == 0) {
+        ASSERT_EQ(3, count);
     }
 }
 

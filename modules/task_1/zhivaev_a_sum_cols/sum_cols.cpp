@@ -3,105 +3,129 @@
 #include <mpi.h>
 #include <vector>
 #include <algorithm>
+#include <functional>
+#include <stdexcept>
+#include <numeric>
 
 using std::vector;
 using std::copy;
+using std::transform;
+using std::plus;
+using std::invalid_argument;
+using std::fill;
+using std::accumulate;
 
-vector<vector<int>> getRandomMatrix(const int rows,
-                                    const int cols) {
-    vector<vector<int>> res(rows);
-    for (vector<int>& i : res) {
-        i.resize(cols);
+vector<int> getRandomMatrix(int rows, int cols) {
+    vector<int> matrix(rows * cols);
+    int counter = 0;
+    for (int& i : matrix) {
+        i = ++counter;
+        counter = counter % 1024;
     }
-
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            res[i][j] = i + j;
-        }
-    }
-
-    return res;
+    return matrix;
 }
 
-vector<int> summColumnsOneProc(vector<vector<int>> matrix) {
-    vector<int> result(matrix[0].size());
-
-    for (const vector<int>& i : matrix) {
-        for (unsigned int j = 0; j < i.size(); ++j) {
-            result[j] += i[j];
+vector<int> sumColumnsOneProc(const int* matrix, int rows, int cols) {
+    if (rows == 0 || cols == 0) {
+        return vector<int>(0);
+    }
+    if (rows < 0 || cols < 0) {
+        throw invalid_argument("Negative args");
+    }
+    vector<int> result(cols);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result[j] += matrix[i * cols + j];
         }
     }
-
     return result;
 }
 
-vector<int> summColumns(vector<vector<int>> matrix) {
-    int rank, size;
-    int rows, cols, delta;
-    const int root = 0;
+int* transponse(int* matrix, int rows, int cols) {
+    int* result = new int[cols * rows];
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            result[j * rows + i] = matrix[i * cols + j];
+        }
+    }
+    return result;
+}
 
-    vector<int> result, localSum;
-    vector<vector<int>> locals;
+vector<int> sumColumns(int* matrix, int rows, int cols) {
+    if (rows == 0 || cols == 0) {
+        return vector<int>(0);
+    }
+    if (rows < 0 || cols < 0) {
+        throw invalid_argument("Negative args");
+    }
 
+    int root = 0;
+
+    int size;
+    int rank;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (rank == root) {
-        rows = matrix.size();
-        cols = matrix[0].size();
-
-        delta = rows / size;
-        if (delta * size != rows) {
-            delta += 1;
-            vector<int> nullVec(cols);
-            for (int i = rows; i < delta * size; ++i) {
-                matrix.push_back(nullVec);
-            }
-            rows = matrix.size();
-        }
-    }
-
-    MPI_Bcast(&rows, 1, MPI_INT, root, MPI_COMM_WORLD);
-    MPI_Bcast(&cols, 1, MPI_INT, root, MPI_COMM_WORLD);
-    MPI_Bcast(&delta, 1, MPI_INT, root, MPI_COMM_WORLD);
-
-    localSum.resize(cols);
-    result.resize(cols);
-
-    locals.resize(delta);
-    for (vector<int>& i : locals) {
-        i.resize(cols);
-    }
-
-    if (rank == root) {
-        for (int i = 0; i < delta; ++i) {
-            copy(matrix[i].begin(), matrix[i].end(),
-                 locals[i].begin());
-        }
-
-        for (int i = 1; i < size; ++i) {
-            for (int j = delta * i; j < delta * (i + 1); ++j) {
-                MPI_Send(matrix[j].data(), cols, MPI_INT,
-                         i, 0, MPI_COMM_WORLD);
-            }
-        }
+    if (rank == 0) {
+        matrix = transponse(matrix, rows, cols);
     } else {
-        MPI_Status status;
-        for (int i = 0; i < delta; ++i) {
-            MPI_Recv(locals[i].data(), cols, MPI_INT,
-                     root, 0, MPI_COMM_WORLD, &status);
+        matrix = nullptr;
+    }
+
+    int tmp = rows; rows = cols; cols = tmp;
+
+    vector<int> result(rows);
+
+    int delta = rows / size;
+    int remainder = rows % size;
+    int localDelta = delta;
+    if (rank < remainder) localDelta++;
+    int localMatrixSize = localDelta * cols;
+
+    int* localMatrix = new int[localMatrixSize];
+    int* localResult = new int[localDelta];
+
+    int* localMatricesSizes = nullptr;
+    int* localDeltas = nullptr;
+    int* displs = nullptr;
+
+    if (rank == root) {
+        localMatricesSizes = new int[size];
+        displs = new int[size];
+        localDeltas = new int[size];
+        fill(localMatricesSizes, localMatricesSizes + size, delta * cols);
+        fill(localDeltas, localDeltas + size, delta);
+        for (int i = 0; i < remainder; i++) {
+            localDeltas[i] += 1;
+            localMatricesSizes[i] += cols;
+        }
+        displs[0] = 0;
+        for (int i = 1; i < size; i++) {
+            displs[i] = displs[i - 1] + localMatricesSizes[i - 1];
         }
     }
 
-    for (const vector<int>& i : locals) {
-        for (int j = 0; j < cols; ++j) {
-            localSum[j] += i[j];
+    MPI_Scatterv(matrix, localMatricesSizes, displs, MPI_INT,
+                 localMatrix, localMatrixSize, MPI_INT, root, MPI_COMM_WORLD);
+
+    fill(localResult, localResult + delta, 0);
+    for (int i = 0; i < localDelta; i++) {
+        localResult[i] = accumulate(localMatrix + i * cols, localMatrix + (i + 1) * cols, 0);
+    }
+
+    if (rank == root) {
+        for (int i = 1; i < size; i++) {
+            displs[i] = displs[i - 1] + localDeltas[i - 1];
         }
     }
 
-    MPI_Reduce(localSum.data(), result.data(), cols, MPI_INT,
-               MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Gatherv(localResult, localDelta, MPI_INT, result.data(), localDeltas, displs, MPI_INT, root, MPI_COMM_WORLD);
 
+    delete[] localMatrix;
+    delete[] localResult;
+    delete[] matrix;
+    delete[] localMatricesSizes;
+    delete[] localDeltas;
 
     return result;
 }

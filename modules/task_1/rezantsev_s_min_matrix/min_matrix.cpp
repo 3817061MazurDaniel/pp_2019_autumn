@@ -9,27 +9,26 @@
 #include <stdexcept>
 #include <vector>
 
-std::vector<std::vector<int>> getRandMatrix(int n, int m) {
+std::vector<int> getRandMatrix(int n, int m) {
   std::mt19937 gen;
   gen.seed(static_cast<unsigned int>(time(0)));
-  std::vector<std::vector<int>> matrix(n, std::vector<int>(m));
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
-      matrix[i][j] = gen() % 100;
-    }
+  std::vector<int> matrix(n * m);
+  for (int i = 0; i < n * m; i++) {
+    matrix[i] = gen() % 100;
   }
   return matrix;
 }
 
-std::vector<int> getOrdMinOfMatrix(const std::vector<std::vector<int>> &a,
-                                   int n, int m) {
+std::vector<int> getOrdMinOfMatrix(const std::vector<int> &a, int n, int m) {
   std::vector<int> x(m, 1000);
   for (int i = 0; i < m; i++)
-    for (int j = 0; j < n; j++) x[i] = std::min(x[i], a[j][i]);
+    for (int j = 0; j < n; j++) {
+      x[i] = std::min(x[i], a[i + j * m]);
+    }
   return x;
 }
 
-std::vector<int> getMinOfMatrix(const std::vector<std::vector<int>> &a, int n,
+std::vector<int> getMinOfMatrix(const std::vector<int> &a, int n,
                                 int m) {
   int size, rank;
   std::vector<int> res(m, 1000);
@@ -45,7 +44,7 @@ std::vector<int> getMinOfMatrix(const std::vector<std::vector<int>> &a, int n,
   if (rank == 0) {
     for (int i = 0; i < m; i++) {
       if (i % size) {
-        for (int j = 0; j < n; j++) str[j] = a[j][i];
+        for (int j = 0; j < n; j++) str[j] = a[i + j * m];
         MPI_Send(&str[0], n, MPI_INT, i % size, 1, MPI_COMM_WORLD);
       }
     }
@@ -54,7 +53,7 @@ std::vector<int> getMinOfMatrix(const std::vector<std::vector<int>> &a, int n,
   std::vector<int> b(n);
   if (rank == 0) {
     for (int i = 0; i < m; i += size) {
-      for (int j = 0; j < n; j++) str[j] = a[j][i];
+      for (int j = 0; j < n; j++) str[j] = a[i + j * m];
       temp[i] = std::min(*min_element(str.begin(), str.end()), temp[i]);
     }
   } else {
@@ -70,12 +69,9 @@ std::vector<int> getMinOfMatrix(const std::vector<std::vector<int>> &a, int n,
     for (int proc = 1; proc < std::min(size, m); proc++) {
       MPI_Recv(&res[0], m, MPI_INT, proc, 2, MPI_COMM_WORLD, &status);
       for (int j = proc; j < m; j += size) {
-        tmp[j] = res[j];
+        temp[j] = res[j];
       }
     }
   }
-  if (rank == 0) {
-    for (int i = 0; i < m; i++) res[i] = std::min(temp[i], tmp[i]);
-  }
-  return res;
+  return temp;
 }

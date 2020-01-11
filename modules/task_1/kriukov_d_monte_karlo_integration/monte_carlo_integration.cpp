@@ -10,13 +10,15 @@ double monteCarloIntegration(double lower_limit, double upper_limit, double(*pfu
     if (point_count < 0)
         throw(1);
 
-    std::mt19937 gen;
-    gen.seed(static_cast<unsigned int>(time(0)));
-    std::uniform_real_distribution<> urd(0, 1);
-
     int size, rank;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::mt19937 gen;
+    time_t curr_time = static_cast<time_t>(rank);
+    gen.seed(static_cast<unsigned int>(time(&curr_time)));
+    std::uniform_real_distribution<> urd(0, 1);
+
     double delta = (upper_limit - lower_limit) / size;
     int local_count = point_count / size;
     double local_sum = 0.0;

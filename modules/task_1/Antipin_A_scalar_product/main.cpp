@@ -69,13 +69,12 @@ TEST(scalar_product, can_product_vectors_with_big_range) {
 TEST(scalar_product, can_product_vectors_with_very_big_range) {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    std::vector<int> vec1(1000000);
-    std::vector<int> vec2(1000000);
+    std::vector<int> vec1(1000000 - 1);
+    std::vector<int> vec2(1000000 - 1);
     if (rank == 0) {
-        vec1 = creatRandomVector(1000000);
-        vec2 = creatRandomVector(1000000);
+        vec1 = creatRandomVector(1000000 - 1);
+        vec2 = creatRandomVector(1000000 - 1);
     }
-
     int res1 = getParallelScalarProduct(vec1, vec2);
     if (rank == 0) {
         int res2 = getSequentialScalarProduct(vec1, vec2);
@@ -84,7 +83,6 @@ TEST(scalar_product, can_product_vectors_with_very_big_range) {
 }
 
 int main(int argc, char** argv) {
-    // srand(time(NULL));
     ::testing::InitGoogleTest(&argc, argv);
     MPI_Init(&argc, &argv);
 

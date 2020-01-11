@@ -1,0 +1,8 @@
+// Copyright 2019 Pauzin Leonid
+#ifndef MODULES_TASK_2_PAUZIN_L_PROD_CONS_PAUZIN_L_PROD_CONS_H_
+#define MODULES_TASK_2_PAUZIN_L_PROD_CONS_PAUZIN_L_PROD_CONS_H_
+
+
+void ParallelFunc(const int n, void *arr);
+
+#endif  // MODULES_TASK_2_PAUZIN_L_PROD_CONS_PAUZIN_L_PROD_CONS_H_

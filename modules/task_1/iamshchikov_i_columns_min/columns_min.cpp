@@ -4,27 +4,26 @@
 #include <ctime>
 #include "../../../modules/task_1/iamshchikov_i_columns_min/columns_min.h"
 
-void getRandomMatrix(std::vector<std::vector<int> >* matrix, int n) {
-    if (n > 0 && matrix->size() > 0) {
+void getRandomMatrix(std::vector<int>* matrix, int n, int m) {
+    if (n > 0 && m > 0) {
         std::mt19937 gen;
         gen.seed(static_cast<unsigned int>(time(0)));
-        for (size_t i = 0; i < matrix->size(); ++i)
-            for (int j = 0; j < n; ++j)
-                matrix->at(i).push_back(gen() % 100);
+        for (int i = 0; i < m*n; ++i)
+            matrix->push_back(gen() % 100);
     } else {
          throw - 1;
     }
 }
 
-void matrixToRow(const std::vector<std::vector<int> >* matrix,
+void transposeMatrix(const std::vector<int>* matrix,
                  std::vector<int>* row, int row_num, int col_num) {
     int k = 0;
     for (int i = 0; i < col_num; ++i)
         for (int j = 0; j < row_num; ++j, ++k)
-            row->at(k) = (matrix->at(j))[i];
+            row->at(k) = (matrix->at(j*col_num+i));
 }
 
-int getMinElem(int* arr, int n) {
+int getMinElem(const int* arr, int n) {
     if (n > 0) {
         int min = arr[0];
         for (int i = 1; i < n; ++i)
@@ -84,29 +83,28 @@ void setDispl(std::vector<int>* elem_displ, std::vector<int>* elem_count,
 }
 
 std::vector<int> getMinElementsSequential(
-                 const std::vector<std::vector<int> >* matrix,
+                 const std::vector<int>* matrix,
                  int row_num, int col_num) {
-    int min;
     std::vector<int> res(col_num);
+    std::vector<int> matrix_in_row(col_num*row_num);
+    std::vector<int>* pmatrix_in_row = &matrix_in_row;
+    transposeMatrix(matrix, pmatrix_in_row, row_num, col_num);
     for (int i = 0; i < col_num; ++i) {
-        min = (matrix->at(0))[i];
-        for (int j = 1; j < row_num; ++j)
-            if ((matrix->at(j))[i] < min) min = (matrix->at(j))[i];
-        res[i] = min;
+        res[i] = getMinElem(pmatrix_in_row->data() + i * row_num, row_num);
     }
     return res;
 }
 
 std::vector<int> getMinElementsParallel(
-                 const std::vector<std::vector<int> >* matrix,
+                 const std::vector<int>* matrix,
                  int row_num, int col_num) {
     MPI_Comm new_comm = MPI_COMM_NULL;
     MPI_Group group_world, new_group;
     int ProcRank, ProcNum, involved_proc_num;
     const int m = row_num, n = col_num;
-    std::vector<int> global_res(n), matrix_in_row(m*n), local_buf, local_res,
+    std::vector<int> global_res(n), transposed_matrix(m*n), local_buf, local_res,
                     elem_count, col_count, elem_displ, col_displ, member;
-    std::vector<int> *pmatrix_in_row = &matrix_in_row,
+    std::vector<int>*ptransposed_matrix = &transposed_matrix,
                     *plocal_buf = &local_buf, *plocal_res = &local_res,
                     *pelem_count = &elem_count, *pcol_count = &col_count,
                     *pelem_displ = &elem_displ, *pcol_displ = &col_displ,
@@ -117,7 +115,7 @@ std::vector<int> getMinElementsParallel(
 
     involved_proc_num = getInvolvedProcNumber(n, ProcNum);
     if (ProcRank == 0) {
-        matrixToRow(matrix, pmatrix_in_row, m, n);
+        transposeMatrix(matrix, ptransposed_matrix, m, n);
     }
     if (involved_proc_num < ProcNum) {
         MPI_Comm_group(MPI_COMM_WORLD, &group_world);
@@ -131,7 +129,7 @@ std::vector<int> getMinElementsParallel(
     setDispl(pelem_displ, pelem_count, pcol_displ, pcol_count);
     if (ProcRank < involved_proc_num) {
         plocal_buf->resize(pelem_count->at(ProcRank));
-        MPI_Scatterv(pmatrix_in_row->data(), pelem_count->data(),
+        MPI_Scatterv(ptransposed_matrix->data(), pelem_count->data(),
                      pelem_displ->data(), MPI_INT, plocal_buf->data(),
                      pelem_count->at(ProcRank), MPI_INT, 0,
                      chooseComm(involved_proc_num, ProcNum, new_comm));

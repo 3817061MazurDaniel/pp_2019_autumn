@@ -21,8 +21,9 @@ int getMaxVectorValue(std::vector<int> vec) {
     int result = 0;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    int d = vec.size() / (size - 1);
+    int d = vec.size() / size;
     int r = vec.size() % size;
+
 
     if (vec.size() == 0) {
         throw std::runtime_error("Vector size must be nonzero");
@@ -31,7 +32,7 @@ int getMaxVectorValue(std::vector<int> vec) {
     if (rank == 0) {
         if (d > 0) {
             for (int thr = 1; thr < size; thr++)
-                MPI_Send(&vec[r] + (thr - 1) * d, d, MPI_INT, thr, 0, MPI_COMM_WORLD);
+                MPI_Send(&vec[r] + thr * d, d, MPI_INT, thr, 0, MPI_COMM_WORLD);
         }
     } else {
         if (d > 0) {
@@ -46,7 +47,7 @@ int getMaxVectorValue(std::vector<int> vec) {
     if (rank == 0) {
         int thr_max;
         MPI_Status status;
-        result = *max_element(vec.begin(), vec.begin() + r);
+        result = *max_element(vec.begin(), vec.begin() + r + d);
         if (d > 0) {
             for (int thr = 1; thr < size; thr++) {
                 MPI_Recv(&thr_max, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
